@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { createServer } from 'http';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+import { initSocket } from './sockets/index.js';
 
 dotenv.config();
 const app = express();
@@ -16,7 +17,7 @@ app.use('/api/users', userRoutes);
 
 const httpServer = createServer(app);
 
-// Socket.IO wiring happens in Part 5
+const io = initSocket(httpServer);
 
 const PORT = process.env.PORT || 4000;
 httpServer.listen(PORT, () => console.log(`Server listening on ${PORT}`));
