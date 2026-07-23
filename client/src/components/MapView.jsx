@@ -12,6 +12,12 @@ export default function MapView({ children, center }) {
 
   return (
     <div className="map-frame">
+        <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <filter id="handDrawnWobble">
+          <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="6" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        </svg>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}

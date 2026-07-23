@@ -1,0 +1,72 @@
+.splash-screen {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #d9c398;
+  cursor: pointer;
+  text-align: center;
+  padding: 2rem;
+}
+
+.splash-scroll {
+  font-family: var(--font-scroll);
+  font-size: 22px;
+  color: #4a3520;
+  margin: 0;
+}
+
+.splash-messrs {
+  font-family: var(--font-title);
+  font-size: 18px;
+  color: #3a2a15;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.splash-messrs span {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.splash-castle {
+  width: 160px;
+  height: auto;
+  margin: 8px 0;
+}
+
+.splash-title-blot {
+  background: radial-gradient(ellipse at center, #6b1616 0%, #4a0f0f 75%, transparent 100%);
+  border-radius: 45% 55% 52% 48% / 55% 45% 55% 45%;
+  padding: 1.5rem 2.5rem;
+}
+
+.splash-title {
+  font-family: var(--font-title);
+  font-size: 26px;
+  color: #f0e2c0;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.oath-text {
+  font-family: var(--font-label);
+  font-size: 22px;
+  color: #3a2a15;
+  margin-top: 16px;
+}
+
+.ink-reveal {
+  position: absolute;
+  inset: 0;
+  background: #0c0a08;
+  animation: ink-spread 1.8s ease-out forwards;
+}
+
+@keyframes ink-spread {
+  from { clip-path: circle(0% at 50% 50%); }
+  to   { clip-path: circle(150% at 50% 50%); }
+}

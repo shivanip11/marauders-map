@@ -1,0 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=MedievalSharp&family=Mrs+Saint+Delafield&display=swap');
+
+:root {
+  --font-scroll: 'UnifrakturMaguntia', cursive;
+  --font-title: 'MedievalSharp', cursive;
+  --font-label: 'Mrs Saint Delafield', cursive;
+}
