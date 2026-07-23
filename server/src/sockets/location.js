@@ -1,4 +1,3 @@
-// server/src/sockets/location.js
 import { pool } from '../config/db.js';
 import { redisClient } from '../config/redis.js';
 
@@ -25,9 +24,15 @@ export function registerLocationHandlers(io, socket) {
       [sessionId, socket.userId, lng, lat, sequenceNumber, recordedAt]
     );
 
+    // Fan-out: broadcast to everyone allowed to see this user (Part 6.4)
+    io.to(`viewers:${socket.userId}`).emit('location:broadcast', {
+      userId: socket.userId, sessionId, lat, lng, recordedAt,
+    });
     socket.on('map:subscribe', async ({ targetUserIds }) => {
-  const allowed = await filterByPermission(socket.userId, targetUserIds);
-  allowed.forEach((id) => socket.join(`viewers:${id}`));
-});
+    // targetUserIds = friends this viewer is allowed to see, resolved server-side
+    // from the friendships + location_permissions tables — never trust a client-supplied list blindly
+    const allowed = await filterByPermission(socket.userId, targetUserIds);
+    allowed.forEach((id) => socket.join(`viewers:${id}`));
+    });
   });
 }
