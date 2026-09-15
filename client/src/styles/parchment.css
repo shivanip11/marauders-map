@@ -35,3 +35,69 @@
   width: 24px;
   margin-top: -4px;
 }
+
+.landmark-label {
+  display: block;
+  width: max-content;
+  max-width: 230px;
+  color: #352315;
+  font-family: var(--font-map-label);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: 0.012em;
+  text-align: center;
+  text-shadow:
+    0 1px rgba(235, 214, 169, 0.76),
+    1px 0 rgba(235, 214, 169, 0.34),
+    -1px 0 rgba(235, 214, 169, 0.34);
+  transform: rotate(var(--label-tilt));
+  transform-origin: center;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  filter: contrast(1.08);
+}
+
+.landmark-label--major {
+  font-family: var(--font-map-label-small-caps);
+  font-size: 18px;
+  line-height: 0.9;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.landmark-label--standard {
+  font-size: 16px;
+  font-variant-caps: small-caps;
+}
+
+.landmark-label--local {
+  color: #49311e;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.landmark-label--long {
+  width: 190px;
+  white-space: normal;
+}
+
+@media (max-width: 640px) {
+  .landmark-label {
+    max-width: 190px;
+    font-size: 15px;
+  }
+
+  .landmark-label--major {
+    font-size: 17px;
+  }
+
+  .landmark-label--local {
+    font-size: 14px;
+  }
+
+  .landmark-label--long {
+    width: 165px;
+  }
+}

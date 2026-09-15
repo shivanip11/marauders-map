@@ -1,12 +1,20 @@
+import { useCallback, useState } from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import LandmarkLabels from './LandmarkLabels';
 import { parchmentMapStyle } from '../styles/parchmentMapStyle';
 
 const containerStyle = { width: '100%', height: '100vh' };
+const mapLibraries = ['places'];
 
 export default function MapView({ children, center }) {
+  const [map, setMap] = useState(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: mapLibraries,
   });
+
+  const handleLoad = useCallback((loadedMap) => setMap(loadedMap), []);
+  const handleUnmount = useCallback(() => setMap(null), []);
 
   if (!isLoaded) return <div>Loading the map...</div>;
 
@@ -22,12 +30,15 @@ export default function MapView({ children, center }) {
         mapContainerStyle={containerStyle}
         center={center}
         zoom={16}
+        onLoad={handleLoad}
+        onUnmount={handleUnmount}
         options={{
           styles: parchmentMapStyle,       // custom JSON theme — Part 10.4
           disableDefaultUI: true,
           gestureHandling: 'greedy',
         }}
       >
+        {map && <LandmarkLabels map={map} />}
         {children}
       </GoogleMap>
     </div>
