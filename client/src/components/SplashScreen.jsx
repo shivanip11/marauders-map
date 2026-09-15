@@ -1,39 +1,54 @@
 import { useState } from 'react';
+import splashParchment from '../assets/marauders-splash-parchment.png';
 
 export default function SplashScreen({ onReveal }) {
   const [revealed, setRevealed] = useState(false);
 
-  function handleClick() {
-    setRevealed(true);
-    setTimeout(onReveal, 1800);
+  function handleReveal() {
+    if (!revealed) setRevealed(true);
   }
 
   return (
-    <div className="splash-screen" onClick={handleClick}>
-      <p className="splash-scroll">Itinerarium Maraudentium</p>
-      <p className="splash-messrs">
-        Messrs Moony, Wormtail,<br />Padfoot &amp; Prongs<br />
-        <span>are proud to present</span>
-      </p>
+    <main className={`splash-screen${revealed ? ' is-revealing' : ''}`}>
+      <div className="splash-folio">
+        <img
+          className="splash-artwork"
+          src={splashParchment}
+          alt="An antique ink drawing of a many-towered magical castle on parchment"
+        />
 
-      <svg className="splash-castle" viewBox="0 0 200 120" aria-hidden="true">
-        <g fill="none" stroke="#4a3520" strokeWidth="1.5">
-          <rect x="40" y="60" width="120" height="50" />
-          <rect x="55" y="35" width="20" height="30" />
-          <rect x="125" y="35" width="20" height="30" />
-          <rect x="85" y="20" width="30" height="45" />
-          <polygon points="55,35 65,20 75,35" />
-          <polygon points="125,35 135,20 145,35" />
-          <polygon points="85,20 100,5 115,20" />
-        </g>
-      </svg>
+        <div className="splash-paper-grain" aria-hidden="true" />
 
-      <div className="splash-title-blot">
-        <p className="splash-title">The<br />Marauder's<br />Map</p>
+        <header className="splash-heading">
+          <p className="splash-scroll">
+            <span>Itinerarium</span>
+            <span>Maraudentium</span>
+          </p>
+          <p className="splash-messrs">
+            <span className="splash-presenters">Messrs</span>
+            Moony, Wormtail,<br />Padfoot &amp; Prongs
+            <span className="splash-present">are proud to present</span>
+          </p>
+        </header>
+
+        <div className="splash-title-blot" aria-label="The Marauder's Map">
+          <span className="splash-title-the">The</span>
+          <span className="splash-title-main">Marauder's</span>
+          <span className="splash-title-map">Map</span>
+        </div>
+
+        <button className="splash-oath" type="button" onClick={handleReveal} disabled={revealed}>
+          <span>I solemnly swear</span>
+          <small>that I am up to no good</small>
+          <i aria-hidden="true">Tap to reveal the map</i>
+        </button>
       </div>
 
-      {revealed && <div className="ink-reveal" />}
-      {!revealed && <p className="oath-text">I solemnly swear that I am up to no good</p>}
-    </div>
+      {revealed && (
+        <div className="ink-reveal" aria-hidden="true" onAnimationEnd={onReveal}>
+          <span />
+        </div>
+      )}
+    </main>
   );
 }
