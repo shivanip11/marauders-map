@@ -6,7 +6,7 @@ export function useSocket(token, sessionId) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL, {
+    const socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
       auth: { token, sessionId },
       reconnection: true,
       reconnectionDelay: 1000,
