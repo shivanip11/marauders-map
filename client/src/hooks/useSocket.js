@@ -1,29 +1,37 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 
 export function useSocket(token, sessionId) {
-  const socketRef = useRef(null);
+  const [socket, setSocket] = useState(null);
   const [connected, setConnected] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
+    const connection = io(import.meta.env.VITE_API_URL || window.location.origin, {
       auth: { token, sessionId },
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
     });
-
-    socket.on('connect', () => setConnected(true));
-    socket.on('disconnect', () => setConnected(false));
-
-    const heartbeat = setInterval(() => socket.emit('heartbeat'), 10000);
-
-    socketRef.current = socket;
+    setSocket(connection);
+    connection.on('connect', () => {
+      setConnected(true);
+      setError('');
+    });
+    connection.on('disconnect', () => setConnected(false));
+    connection.on('connect_error', (err) => {
+      setConnected(false);
+      setError(err.message === 'Unauthorized' ? 'Please refresh and sign in again.' : err.message);
+    });
+    const heartbeat = setInterval(() => {
+      if (connection.connected) connection.emit('heartbeat');
+    }, 10000);
     return () => {
       clearInterval(heartbeat);
-      socket.disconnect();
+      connection.disconnect();
+      setConnected(false);
     };
   }, [token, sessionId]);
 
-  return { socket: socketRef.current, connected };
+  return { socket, connected, error };
 }

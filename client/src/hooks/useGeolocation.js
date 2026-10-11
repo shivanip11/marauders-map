@@ -1,26 +1,30 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useGeolocation(onUpdate) {
-  const sequenceRef = useRef(0);
+  const onUpdateRef = useRef(onUpdate);
+  const [error, setError] = useState('');
+  useEffect(() => { onUpdateRef.current = onUpdate; }, [onUpdate]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      console.error('Geolocation not supported by this browser');
+      setError('Your browser does not support location access.');
       return;
     }
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
-        sequenceRef.current += 1;
-        onUpdate({
+        setError('');
+        onUpdateRef.current({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
-          sequenceNumber: sequenceRef.current,
-          recordedAt: new Date().toISOString(),
+          recordedAt: new Date(pos.timestamp).toISOString(),
         });
       },
-      (err) => console.error('Geolocation error', err),
+      (err) => setError(err.code === 1
+        ? 'Allow location access in your browser to place yourself on the map.'
+        : 'Waiting for your location. Check that location services are enabled.'),
       { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
     );
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [onUpdate]);
+  }, []);
+  return error;
 }

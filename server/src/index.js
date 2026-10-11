@@ -18,6 +18,7 @@ app.use('/api/users', userRoutes);
 const httpServer = createServer(app);
 
 const io = initSocket(httpServer);
+app.set('io', io);
 
 const PORT = process.env.PORT || 4000;
 httpServer.listen(PORT, () => console.log(`Server listening on ${PORT}`));

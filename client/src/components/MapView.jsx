@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 import LandmarkLabels from './LandmarkLabels';
 import { parchmentMapStyle } from '../styles/parchmentMapStyle';
@@ -6,7 +6,7 @@ import { parchmentMapStyle } from '../styles/parchmentMapStyle';
 const containerStyle = { width: '100%', height: '100vh' };
 const mapLibraries = ['places'];
 
-export default function MapView({ children, center }) {
+export default function MapView({ children, center, fitPositions }) {
   const [map, setMap] = useState(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -15,6 +15,18 @@ export default function MapView({ children, center }) {
 
   const handleLoad = useCallback((loadedMap) => setMap(loadedMap), []);
   const handleUnmount = useCallback(() => setMap(null), []);
+
+  useEffect(() => {
+    if (!map || !fitPositions?.length) return;
+    if (fitPositions.length === 1) {
+      map.panTo(fitPositions[0]);
+      map.setZoom(16);
+      return;
+    }
+    const bounds = new window.google.maps.LatLngBounds();
+    fitPositions.forEach(({ lat, lng }) => bounds.extend({ lat, lng }));
+    map.fitBounds(bounds, 80);
+  }, [map, fitPositions]);
 
   if (!isLoaded) return <div>Loading the map...</div>;
 

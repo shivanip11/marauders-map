@@ -1,3 +1,57 @@
+.map-screen {
+  position: relative;
+}
+
+.map-sharing-panel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  box-sizing: border-box;
+  width: min(300px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid #6b4c28;
+  background: #e8dcc0;
+  color: #3a2a15;
+  box-shadow: 0 3px 12px #3a2a1533;
+  font-family: var(--font-label);
+}
+
+.map-sharing-panel p {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.map-sharing-panel button {
+  padding: 8px 10px;
+  border: 1px solid #6b4c28;
+  background: #3a2a15;
+  color: #e8dcc0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.map-sharing-panel button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.map-sharing-panel ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.map-sharing-panel li + li {
+  margin-top: 6px;
+}
+
+.map-sharing-panel .map-sharing-error {
+  color: #842626;
+}
+
 .map-frame {
   position: relative;
   background-color: #d9c398;

@@ -8,5 +8,7 @@ await redisClient.connect();
 
 export const redisPubClient = redisClient.duplicate();
 export const redisSubClient = redisClient.duplicate();
+redisPubClient.on('error', (err) => console.error('Redis publisher error', err.message));
+redisSubClient.on('error', (err) => console.error('Redis subscriber error', err.message));
 await redisPubClient.connect();
 await redisSubClient.connect();
