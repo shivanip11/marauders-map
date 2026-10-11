@@ -46,18 +46,17 @@ export function registerLocationHandlers(io, socket) {
       // Bind writes to the authenticated session and its sharing permission.
       // Reject late/out-of-order updates atomically in the database.
       const result = await pool.query(
-        `INSERT INTO locations (session_id, user_id, geom, sequence_number, recorded_at)
-         SELECT s.id, s.user_id, ST_SetSRID(ST_MakePoint($3, $4), 4326)::geography, $5, $6
-         FROM sessions s JOIN location_permissions p ON p.user_id = s.user_id
-         WHERE s.id = $1 AND s.user_id = $2 AND s.socket_id = $7
-           AND p.sharing_enabled AND p.visible_to IN ('everyone', 'friends')
-         ON CONFLICT (session_id) DO UPDATE SET geom = EXCLUDED.geom,
-           sequence_number = EXCLUDED.sequence_number, recorded_at = EXCLUDED.recorded_at,
-           received_at = now()
-         WHERE locations.sequence_number < EXCLUDED.sequence_number
-         RETURNING session_id`,
-        [sessionId, userId, lng, lat, sequenceNumber, recordedAt, socket.id]
-      );
+      `INSERT INTO locations (session_id, user_id, lat, lng, sequence_number, recorded_at)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (session_id) DO UPDATE
+         SET lat = EXCLUDED.lat,
+             lng = EXCLUDED.lng,
+             sequence_number = EXCLUDED.sequence_number,
+             recorded_at = EXCLUDED.recorded_at,
+             received_at = now()
+       WHERE locations.sequence_number < EXCLUDED.sequence_number`,
+      [sessionId, socket.userId, lat, lng, sequenceNumber, recordedAt]
+    );
       if (!result.rowCount) return reply({ ok: true, shared: false });
 
       const permission = await pool.query(

@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS locations;
+
+CREATE TABLE locations (
+  session_id UUID PRIMARY KEY REFERENCES sessions(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  lat DOUBLE PRECISION NOT NULL,
+  lng DOUBLE PRECISION NOT NULL,
+  sequence_number BIGINT NOT NULL,
+  recorded_at TIMESTAMPTZ NOT NULL,
+  received_at TIMESTAMPTZ DEFAULT now()
+);
