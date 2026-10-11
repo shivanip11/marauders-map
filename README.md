@@ -1,59 +1,169 @@
-# The Marauder's Map
-<<<<<<< HEAD
-A real-time, multi-user location-sharing web app styled after the Marauder's Map from Harry Potter.
-=======
-A real-time, multi-user location-sharing web app styled after the Marauder's Map from Harry Potter.
+<div align="center">
 
-## HTTPS development with ngrok
+# The Marauder’s Map
 
-Use one tunnel to the frontend. Vite forwards `/api` and `/socket.io` to the
-backend on port 4000, including WebSocket connections.
+**“I solemnly swear that I am up to no good.”**
 
-In `client/.env`, leave `VITE_API_URL=` empty and set
-`NGROK_HOST=your-assigned-host.ngrok-free.dev` to your ngrok hostname (no scheme
-or path). Keep your Google Maps key in this file. In `server/.env`, set
-`CLIENT_ORIGIN=https://your-assigned-host.ngrok-free.dev`. Copy the exact hostname
-from ngrok's forwarding URL, including its `.dev` or `.app` ending.
+A real-time location-sharing app that brings the Marauder’s Map to the real world: parchment streets, named footsteps, and a map you reveal with an oath.
 
-Run these commands in three separate terminals from the project root:
+[**Open the live map ↗**](https://marauders-map-sigma.vercel.app/) · [Run locally](docs/setup.md) · [Deployment](docs/deployment.md) · [Contribute](CONTRIBUTING.md)
 
-| Terminal | Commands |
+![React](https://img.shields.io/badge/React-19-61452c?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-61452c?logo=vite&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-live_updates-61452c?logo=socketdotio&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PostGIS-61452c?logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-presence-61452c?logo=redis&logoColor=white)
+
+</div>
+
+## A little mischief, mapped
+
+Reveal the parchment, create an account, and allow location access to see your own footsteps. Sharing starts off. Choose **Share with everyone on this map** to appear on other people’s maps, and **Stop sharing my location** to turn it off.
+
+To try it with someone else, open the live site on two devices, sign in with different accounts, and enable sharing on both. **Show everyone** fits visible users on the map; selecting a name brings that person into view.
+
+## What’s inside
+
+- Animated parchment reveal and themed sign-in.
+- Google Maps with custom styling and landmark labels.
+- Named footsteps driven by browser geolocation.
+- Authenticated Socket.IO connections for live updates.
+- Account-level sharing controls and multi-device sessions.
+- Reconnection snapshots and a short offline grace period.
+
+The interface offers sharing with everyone or turning sharing off. Friends-only visibility exists in the backend, but a friend-management interface is not implemented.
+
+## Screenshots
+
+See the [capture guide](docs/screenshots/README.md) to add screenshots. The embeds below are ready to enable once the files are added.
+
+<!-- Add the actual images before uncommenting this block.
+![Parchment reveal](docs/screenshots/reveal.png)
+
+| Sign in | Live footsteps |
 | --- | --- |
-| Backend | `cd server`, then `npm run dev` |
-| Frontend | `cd client`, then `npm run dev` |
-| Tunnel | `ngrok http 5173` |
+| ![Account sign-in](docs/screenshots/sign-in.png) | ![Live map](docs/screenshots/live-map.png) |
+-->
 
-Keep all three running. Open the **HTTPS forwarding URL shown by ngrok** in your
-browser or on your phone. The local servers still print HTTP URLs; ngrok provides
-HTTPS for the public address. Pressing Ctrl+C in the ngrok terminal disconnects
-the tunnel. A separate tunnel to port 4000 is not needed.
+## Run it locally
 
-If the ngrok hostname changes, update `NGROK_HOST` and `CLIENT_ORIGIN` and restart
-the frontend and backend. This proxy configuration applies to the Vite dev
-server; a production deployment needs its own API/WebSocket routing or an explicit
-HTTPS `VITE_API_URL`.
+You need **Node.js 22.12+**, npm, Docker Desktop (or PostgreSQL with PostGIS and Redis), and a Google Maps browser key.
 
-## Seeing other users
+> This checkout has known location-write/schema inconsistencies. These instructions start the app, but live sharing needs the [current issues](docs/troubleshooting.md#current-location-sharing-limitations) resolved. The deployment may use a different schema or revision.
 
-Sign in separately on each device and allow browser location access. In the map
-panel, choose **Share with everyone on this map** on each account that should be
-visible. Sharing starts disabled; seeing your own footsteps does not mean your
-location is shared. The setting applies to the account and can be turned off with
-**Stop sharing my location**.
+### 1. Clone and configure
 
-The panel shows the connection status and other visible users. Choose **Show
-everyone** to fit their positions on screen, or choose a name to find that user.
-Users who reconnect receive existing shared positions without waiting for anyone
-to move. Offline markers disappear after a short reconnection grace period.
+```sh
+git clone https://github.com/shivanip11/marauders-map.git
+cd marauders-map
+```
 
-After upgrading from the original sessionless login, refresh and sign in again
-on each device so a valid session is created.
+Copy the templates:
 
-## Sharing integration checks
+```powershell
+# Windows PowerShell
+Copy-Item client/.env.example client/.env
+Copy-Item server/.env.example server/.env
+```
 
-With PostgreSQL (including PostGIS), Redis, and both packages' dependencies
-installed, run `npm run test:integration` in `server`. The test uses a temporary
-database schema and isolated Redis channel, checks two-user sharing, permissions,
-session ownership and reconnection, and removes its test data afterward. The
-database role needs permission to create a schema.
->>>>>>> 9edf66a (able to share location to every other user on the map)
+```sh
+# macOS / Linux
+cp client/.env.example client/.env
+cp server/.env.example server/.env
+```
+
+Add your Maps key to `client/.env` and replace `JWT_SECRET` in `server/.env`. Leave `VITE_API_URL` empty locally.
+
+### 2. Start PostgreSQL and Redis
+
+With Docker’s engine running, from the repository root:
+
+```sh
+docker compose up -d --wait
+```
+
+A new PostgreSQL volume is initialized with PostGIS and the base schema. See [Troubleshooting](docs/troubleshooting.md) if ports 5432 or 6379 are already occupied.
+
+### 3. Start both apps
+
+Use **two separate terminals**, starting from the repository root:
+
+```sh
+# Terminal 1 — backend
+cd server
+npm ci
+npm run dev
+```
+
+```sh
+# Terminal 2 — frontend
+cd client
+npm ci
+npm run dev
+```
+
+Open **http://localhost:5173**. The backend runs at **http://localhost:4000**; Vite forwards `/api` and `/socket.io` to it.
+
+For Google Maps configuration, setup without Docker, and testing on your phone, follow the [full setup guide](docs/setup.md).
+
+## How it fits together
+
+```mermaid
+flowchart LR
+    Browser[React + Google Maps] -->|HTTP API| API[Express]
+    Browser <-->|Live updates| Socket[Socket.IO]
+    API --> DB[(PostgreSQL + PostGIS)]
+    Socket --> DB
+    Socket <--> Redis[(Redis presence + pub/sub)]
+```
+
+| Layer | Tools | Purpose |
+| --- | --- | --- |
+| Frontend | React, Vite, Google Maps | Map, account forms, geolocation |
+| Backend | Node.js, Express, Socket.IO | Accounts, sharing settings, live events |
+| Database | PostgreSQL, PostGIS | Users, sessions, permissions, latest positions |
+| Presence | Redis, Socket.IO Redis adapter | Presence keys and events across backend instances |
+| Authentication | JWT, bcrypt | Signed sessions and password hashing |
+
+## Repository guide
+
+```text
+client/                   React app and Vite configuration
+  .env.example            Browser configuration
+  src/components/         Reveal, sign-in, map, markers
+  src/hooks/              Geolocation and socket lifecycle
+server/                   Express and Socket.IO backend
+  .env.example            Database, Redis, authentication settings
+  db/                     Base schema and alternate location-table SQL
+  src/config/             Database and Redis clients
+  src/sockets/            Location updates and presence
+  test/                   Sharing integration test
+docs/                     Setup, deployment, troubleshooting, screenshots
+compose.yaml              Local PostgreSQL/PostGIS and Redis
+```
+
+## Development commands
+
+| Directory | Command | Purpose |
+| --- | --- | --- |
+| `client` | `npm run dev` | Frontend on port 5173 |
+| `client` | `npm run build` | Production bundle in `client/dist` |
+| `client` | `npm run preview` | Build preview; no development API proxy |
+| `client` | `npm run lint` | Oxlint |
+| `server` | `npm run dev` | Backend with nodemon |
+| `server` | `npm start` | Backend without file watching |
+| `server` | `npm run test:integration` | Sharing checks; see [requirements](CONTRIBUTING.md#validation) |
+
+## More documentation
+
+- [Setup and environment reference](docs/setup.md)
+- [Deployment and routing](docs/deployment.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Contributing](CONTRIBUTING.md)
+- [Adding screenshots](docs/screenshots/README.md)
+
+## Credits
+
+Inspired by the Marauder’s Map from Harry Potter. This independent fan project is not affiliated with the rights holders. Map services are provided by Google Maps Platform.
+
+No project license is currently included in this repository.
